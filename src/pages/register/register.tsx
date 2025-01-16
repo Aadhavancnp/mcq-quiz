@@ -4,10 +4,11 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-const Login = () => {
+const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login } = useAuth();
+  const [name, setName] = useState("");
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleAuthentication = async (e: React.FormEvent) => {
@@ -21,8 +22,12 @@ const Login = () => {
       alert("Password must be at least 6 characters long");
       return;
     }
+    if (name.length < 3) {
+      alert("Name must be at least 3 characters long");
+      return;
+    }
     try {
-      await login(email, password);
+      await register(email, password, name);
     } catch (error: any) {
       alert(error.message);
     }
@@ -35,7 +40,15 @@ const Login = () => {
         onSubmit={handleAuthentication}
         className="p-8 bg-white rounded-lg shadow-md space-y-4 w-full max-w-md"
       >
-        <h2 className="mb-2 text-2xl font-bold">Login</h2>
+        <h2 className="mb-2 text-2xl font-bold">Register</h2>
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          type="text"
+          autoComplete="name"
+          placeholder="Enter your name"
+          required
+        />
         <Input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -53,15 +66,15 @@ const Login = () => {
           required
         />
         <Button type="submit" className="w-full">
-          Login
+          Register
         </Button>
         <div className="flex items-center justify-between">
           <Button
             type="button"
-            onClick={() => navigate("/register")}
+            onClick={() => navigate("/login")}
             className="w-full"
           >
-            Register
+            Login
           </Button>
           <span className="w-2"></span>
           <Button
@@ -77,4 +90,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

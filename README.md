@@ -1,11 +1,52 @@
-# React + TypeScript + Vite
+# MCQ Test Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Project Overview
 
-Currently, two official plugins are available:
+This project aims to develop a web application for conducting Multiple Choice Question (MCQ) tests. The application will allow users to log in, select a test, answer questions, and receive immediate feedback on their performance.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Problem Statement
+
+Existing MCQ test platforms often lack interactivity, personalized feedback, and efficient question management. This project addresses these limitations by providing a user-friendly interface, instant feedback mechanisms, and a robust system for managing questions and tests.
+
+## Requirements
+
+**Functional Requirements:**
+
+1. **User Authentication:** Users should be able to log in securely.
+2. **Test Selection:** Users should be able to choose from a list of available tests.
+3. **Question Display:** Questions should be displayed clearly with multiple-choice options.
+4. **Answer Submission:** Users should be able to submit their answers.
+5. **Immediate Feedback:** Users should receive immediate feedback on their answers.
+6. **Test Completion:** Users should be notified upon completing a test and view their score.
+7. **Question Management:** (Optional) Administrators should be able to add, edit, and delete questions.
+
+**Non-Functional Requirements:**
+
+1. **User-Friendly Interface:** The application should be intuitive and easy to navigate.
+2. **Responsiveness:** The application should be responsive across different devices.
+3. **Security:** User data and test content should be protected.
+4. **Performance:** The application should load quickly and respond efficiently to user interactions.
+
+## Priority
+
+The features are prioritized as follows:
+
+**High Priority:** User authentication, test selection, question display, answer submission, immediate feedback, test completion.
+**Medium Priority:** Question management (optional).
+**Low Priority:** Advanced features like analytics, time limits, and adaptive testing.
+
+This prioritization ensures that the core functionality of the MCQ test application is delivered first, followed by optional features and enhancements.
+
+## Expected Deliverables
+
+1. **Functional Web Application:** A fully functional web application meeting the requirements outlined above.
+2. **Source Code:** Well-structured and documented source code.
+3. **User Documentation:** Clear instructions on how to use the application.
+4. **Deployment Guide:** Instructions for deploying the application.
+
+
+
+
 
 ## Expanding the ESLint configuration
 
