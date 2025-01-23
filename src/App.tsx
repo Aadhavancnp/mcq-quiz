@@ -1,37 +1,22 @@
 import "./App.css";
 import { Routes, Route, Navigate } from "react-router";
-import { useAuth } from "./auth/AuthContext";
 import Login from "./pages/login/Login";
 import SearchPage from "./pages/search/search";
 import MCQTest from "./pages/mcq/MCQTest";
 import Register from "./pages/register/register";
 import ForgotPassword from "./pages/forgot-password/ForgotPassword";
+import CameraCheck from "./pages/camera-check/cameraCheck";
 
 function App() {
-  const { isAuthenticated } = useAuth();
-
+  const isAuthenticated = localStorage.getItem("authUser") !== null;
   return (
     <Routes>
-      <Route
-        path="/login"
-        element={isAuthenticated ? <Navigate to="/" /> : <Login />}
-      />
-      <Route
-        path="/register"
-        element={isAuthenticated ? <Navigate to="/" /> : <Register />}
-      />
-      <Route
-        path="/forgot-password"
-        element={isAuthenticated ? <Navigate to="/" /> : <ForgotPassword />}
-      />
-      <Route
-        path="/"
-        element={isAuthenticated ? <MCQTest /> : <Navigate to="/login" />}
-      />
-      <Route
-        path="/search"
-        element={isAuthenticated ? <SearchPage /> : <Navigate to="/login" />}
-      />
+        <Route path="/" element={isAuthenticated ? <SearchPage /> : <Navigate to="/login" />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/camera-check" element={<CameraCheck />} />
+        <Route path="/quiz" element={isAuthenticated ? <MCQTest /> : <Navigate to="/login" />} />
     </Routes>
   );
 }

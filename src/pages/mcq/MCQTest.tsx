@@ -84,6 +84,7 @@ const MCQTest = () => {
         })
         .exec();
       if (response) {
+        console.log(response);
         setQuestions(response.sort(() => Math.random() - 0.5)); // Shuffle questions
         setSelectedAnswers(Array(response.length).fill(null));
       }
@@ -169,18 +170,33 @@ const MCQTest = () => {
     setShowPermissionDialog(false);
   };
 
+  const terminateTest =() => {
+    setTestTerminated(true);
+    setIsTracking(false);
+    showAlert(
+      "Test Terminated",
+      "The test has been terminated due to multiple violations of test rules."
+    );
+  };
+
   const addWarning = useCallback(
     (message: string) => {
       if (!isTracking) return;
       const newWarning = { id: Date.now(), message };
       setWarnings((prev) => [...prev, newWarning]);
-      setTotalWarnings((prev) => prev + 1); // Increment total warnings counter
-      setTimeout(
+      setTotalWarnings((prev) => {
+        const newTotal = prev + 1
+        if (newTotal >= WARNING_LIMIT) {
+          terminateTest()
+        }
+        return newTotal
+      });
+        setTimeout(
         () => setWarnings((prev) => prev.filter((w) => w.id !== newWarning.id)),
         5000
       );
     },
-    [isTracking]
+    [isTracking, terminateTest]
   );
 
   const removeWarning = useCallback((id: number) => {
@@ -239,14 +255,8 @@ const MCQTest = () => {
     warningsRef.current = warnings;
   }, [warnings]);
 
-  const terminateTest = useCallback(() => {
-    setTestTerminated(true);
-    setIsTracking(false);
-    showAlert(
-      "Test Terminated",
-      "The test has been terminated due to multiple violations of test rules."
-    );
-  }, []);
+
+
 
   useEffect(() => {
     if (testTerminated) {
@@ -388,11 +398,11 @@ const MCQTest = () => {
 
   useEffect(() => {
     if (showResults) {
-      if (visibilityRef.current)
-        document.removeEventListener("visibilitychange", visibilityRef.current);
-      if (blurRef.current) window.removeEventListener("blur", blurRef.current);
-      if (mouseLeaveRef.current)
-        document.removeEventListener("mouseleave", mouseLeaveRef.current);
+      // if (visibilityRef.current)
+      //   document.removeEventListener("visibilitychange", visibilityRef.current);
+      // if (blurRef.current) window.removeEventListener("blur", blurRef.current);
+      // if (mouseLeaveRef.current)
+      //   document.removeEventListener("mouseleave", mouseLeaveRef.current);
       return;
     }
     const handleVisibilityChange = () => {
@@ -411,9 +421,9 @@ const MCQTest = () => {
       addWarning("Mouse left the test window. This action has been recorded.");
     };
 
-    visibilityRef.current = handleVisibilityChange;
-    blurRef.current = handleBlur;
-    mouseLeaveRef.current = handleMouseLeave;
+    // visibilityRef.current = handleVisibilityChange;
+    // blurRef.current = handleBlur;
+    // mouseLeaveRef.current = handleMouseLeave;
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("blur", handleBlur);
@@ -427,10 +437,10 @@ const MCQTest = () => {
   }, [addWarning, showResults]);
 
   useEffect(() => {
-    if (warningsRef.current.length >= WARNING_LIMIT && !testTerminated) {
+    if (totalWarnings >= WARNING_LIMIT && !testTerminated) {
       terminateTest();
     }
-  }, [warnings, testTerminated, terminateTest]);
+  }, [totalWarnings, testTerminated, terminateTest, WARNING_LIMIT]);
 
   if (testTerminated) {
     return (
@@ -491,7 +501,7 @@ const MCQTest = () => {
                   </Button>
                   <Button onClick={restartTest}>Restart Test</Button>
                   <Button
-                    onClick={() => navigate("/search")}
+                    onClick={() => navigate("/")}
                     variant="outline"
                     className="md:col-span-2"
                   >

@@ -5,25 +5,16 @@ import { Input } from "@/components/ui/input";
 import { Search, Loader2 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 
-import OpenAI from "openai";
 import { useAuth } from "@/auth/AuthContext";
 import { Question } from "@/types/Question";
 import { useNavigate } from "react-router";
 import db from "@/lib/db";
 
-const baseURL = "https://api.aimlapi.com/v1";
-const apiKey = "57b59c54d1af40739e5413f6fe66e60e";
+const baseURL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="
+const apiKey = "AIzaSyBjCKEmQ9tw4Ve8H3L-J2WvVrfBRRAf2Vg";
 
 const systemPrompt =
   'You are a quiz bot.Output only valid JSON in this exact format: [{"question":string,"options":string[],"answer":number,"category":string}]';
-const userPrompt =
-  "Generate 5 {query} questions with 4 options each.Output only valid JSON with no additional text or formatting";
-
-const api = new OpenAI({
-  apiKey,
-  baseURL,
-  dangerouslyAllowBrowser: true,
-});
 
 const SearchPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,38 +28,69 @@ const SearchPage = () => {
     setLoading(true);
     setError("");
     try {
-      const completion = await api.chat.completions.create({
-        model: "meta-llama/Llama-3-8b-chat-hf",
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          {
-            role: "user",
-            content: userPrompt.replace("{query}", searchQuery),
-          },
-        ],
-      });
-      const response = completion.choices[0].message.content;
-      const startIndex = response?.indexOf("[");
-      const trimmedResponse = response?.substring(startIndex as number);
-      const data = JSON.parse(trimmedResponse || "{}");
-      console.log(data);
-
-      if (!data) {
-        setError("Failed to fetch questions");
+      const requestBody = {
+        contents: [{
+          role: "user",
+          parts: [
+            {text: systemPrompt},
+              {text: `Generate topics from ${searchQuery} as questions with 4 options each and same category.Output only valid JSON with no additional text or formatting fully`}]
+          }],
+        
+    };
+    console.log(requestBody);
+    const response = await fetch(baseURL + apiKey, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+         "x-goog-api-key": apiKey, // Pass API key as header
+      },
+      body: JSON.stringify(requestBody),
+    });
+      
+      if (!response.ok) {
+          const errorData = await response.json(); // try to get more detailed error message
+          console.error("Gemini API error:", errorData);
+        setError(`Failed to fetch questions (HTTP ${response.status}): ${JSON.stringify(errorData)}`);
         return;
       }
+      
+      const dataRes = await response.json();
+      console.log(dataRes);
+      const responseText = dataRes?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-      const questions: Question[] = data.map((q: any, index: number) => ({
-        ...q,
-        id: index,
-      }));
+      if (!responseText) {
+          setError("Failed to get valid response content from Gemini");
+          return;
+        }
+
+       const cleanText = responseText
+       .replace(/^```json/, '')  // Remove ```json at the start
+       .replace(/```$/, '')      // Remove ``` at the end
+       .trim();
+ 
+     // Debug: Log the cleanText to inspect its contents
+     console.log('Cleaned Text:', cleanText.substring(0, cleanText.length - 3));
+
+       if (!cleanText) {
+          setError("Failed to fetch questions");
+          return;
+        }
+
+        const questions: Question[] = JSON.parse(cleanText.substring(0, cleanText.length - 3)).map((q: any, index: number) => ({
+            ...q,
+            id: index,
+          }));
+
+      const category = questions[0].category;
+      //set all questions to same category
+      questions.forEach((q) => {
+        q.category = category;
+      });
 
       setQuestions(questions);
+      console.log(questions);
       const docs = await db.questions.find().exec();
-
+        
       const datawithIds = questions.map((q) => {
         const existingDoc = docs.find((doc) => doc.question === q.question);
         if (existingDoc) {
@@ -80,6 +102,7 @@ const SearchPage = () => {
           };
         }
       });
+      setQuestions(datawithIds);
 
       await db.questions.bulkInsert(datawithIds);
     } catch (err) {
@@ -152,7 +175,7 @@ const SearchPage = () => {
               className="w-full"
               onClick={() => {
                 if (questions.length > 0)
-                  navigate(`/?category=${questions[0].category}`);
+                  navigate(`/camera-check?category=${questions[0].category}`);
                 else navigate(`/`);
               }}
             >

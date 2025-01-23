@@ -72,7 +72,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       localStorage.setItem("authUser", JSON.stringify(userWithoutPassword));
       setUser(userWithoutPassword);
       setIsAuthenticated(true);
-      navigate("/search");
+      navigate("/");
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
