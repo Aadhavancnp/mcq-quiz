@@ -11,14 +11,14 @@ export const questions: Question[] = [
       'System.out.println("Hello World")',
     ],
     answer: 1,
-    type: "Python Programming"
+    category: "Python Programming"
   },
   {
     id: 2,
-    question: "Which of these is a mutable data type in Python?",
+    question: "Which of these is a mutable data category in Python?",
     options: ["List", "Tuple", "String", "Integer"],
     answer: 0,
-    type: "Python Programming"
+    category: "Python Programming"
 
   },
   {
@@ -31,7 +31,7 @@ export const questions: Question[] = [
       "Defines a class",
     ],
     answer: 0,
-    type: "Python Programming"
+    category: "Python Programming"
 
   },
   {
@@ -44,7 +44,7 @@ export const questions: Question[] = [
       "To create a class",
     ],
     answer: 0,
-    type: "Python Programming"
+    category: "Python Programming"
 
   },
   {
@@ -52,7 +52,7 @@ export const questions: Question[] = [
     question: "Which keyword is used to define a function in Python?",
     options: ["function", "def", "procedure", "method"],
     answer: 1,
-    type: "Python Programming"
+    category: "Python Programming"
 
   },
 ];
